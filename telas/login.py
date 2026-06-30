@@ -30,24 +30,32 @@ def abrir_login(app, limpar_tela):
         usuario = campo_usuario.get()
         senha = campo_senha.get()
 
+        print("Tentando login...")
+        print("Usuário:", usuario)
+        print("Senha:", senha)
+
         conn = conectar()
         cursor = conn.cursor()
 
         # Busca usuário no banco
-        cursor.execute("""
+        cursor.execute(
+            """
         SELECT * FROM usuarios
         WHERE usuario=? AND senha=?
-        """, (usuario, senha))
+        """,
+            (usuario, senha),
+        )
 
         resultado = cursor.fetchone()
         conn.close()
+
+        print("Resultado banco:", resultado)
 
         if resultado:
             abrir_sistema(app, limpar_tela)
         else:
             label_resultado.configure(
-                text="Usuário ou senha incorretos",
-                text_color="red"
+                text="Usuário ou senha incorretos", text_color="red"
             )
 
     # Função recuperar senha
@@ -57,19 +65,19 @@ def abrir_login(app, limpar_tela):
         email = campo_usuario.get()
 
         if not email:
-            messagebox.showwarning(
-                "Aviso",
-                "Digite seu e-mail no campo usuário."
-            )
+            messagebox.showwarning("Aviso", "Digite seu e-mail no campo usuário.")
             return
 
         conn = conectar()
         cursor = conn.cursor()
 
         # Verifica se e-mail existe
-        cursor.execute("""
+        cursor.execute(
+            """
         SELECT * FROM usuarios WHERE email=?
-        """, (email,))
+        """,
+            (email,),
+        )
 
         usuario = cursor.fetchone()
         conn.close()
@@ -88,10 +96,7 @@ def abrir_login(app, limpar_tela):
             messagebox.showerror("Erro", "Falha ao enviar e-mail.")
             return
 
-        messagebox.showinfo(
-            "Sucesso",
-            f"Código enviado para {email}"
-        )
+        messagebox.showinfo("Sucesso", f"Código enviado para {email}")
 
         abrir_validacao_codigo(email, codigo)
 
@@ -105,27 +110,16 @@ def abrir_login(app, limpar_tela):
             if codigo_digitado == codigo_enviado:
                 abrir_nova_senha(email)
             else:
-                resultado_codigo.configure(
-                    text="Código inválido",
-                    text_color="red"
-                )
+                resultado_codigo.configure(text="Código inválido", text_color="red")
 
-        ctk.CTkLabel(
-            app,
-            text="Validação de Código",
-            font=("Arial", 24)
-        ).pack(pady=20)
+        ctk.CTkLabel(app, text="Validação de Código", font=("Arial", 24)).pack(pady=20)
 
         ctk.CTkLabel(app, text="Digite o código recebido").pack()
 
         campo_codigo = ctk.CTkEntry(app, width=250)
         campo_codigo.pack(pady=10)
 
-        ctk.CTkButton(
-            app,
-            text="Validar",
-            command=validar_codigo
-        ).pack(pady=10)
+        ctk.CTkButton(app, text="Validar", command=validar_codigo).pack(pady=10)
 
         resultado_codigo = ctk.CTkLabel(app, text="")
         resultado_codigo.pack()
@@ -144,43 +138,31 @@ def abrir_login(app, limpar_tela):
             conn = conectar()
             cursor = conn.cursor()
 
-            cursor.execute("""
+            cursor.execute(
+                """
             UPDATE usuarios
             SET senha=?
             WHERE email=?
-            """, (nova_senha, email))
+            """,
+                (nova_senha, email),
+            )
 
             conn.commit()
             conn.close()
 
-            messagebox.showinfo(
-                "Sucesso",
-                "Senha alterada com sucesso"
-            )
+            messagebox.showinfo("Sucesso", "Senha alterada com sucesso")
 
             abrir_login(app, limpar_tela)
 
-        ctk.CTkLabel(
-            app,
-            text="Nova Senha",
-            font=("Arial", 24)
-        ).pack(pady=20)
+        ctk.CTkLabel(app, text="Nova Senha", font=("Arial", 24)).pack(pady=20)
 
         campo_nova_senha = ctk.CTkEntry(app, show="*", width=250)
         campo_nova_senha.pack(pady=10)
 
-        ctk.CTkButton(
-            app,
-            text="Salvar",
-            command=salvar_nova_senha
-        ).pack(pady=10)
+        ctk.CTkButton(app, text="Salvar", command=salvar_nova_senha).pack(pady=10)
 
     # Interface login
-    ctk.CTkLabel(
-        app,
-        text="Sistema de Login",
-        font=("Arial", 24)
-    ).pack(pady=20)
+    ctk.CTkLabel(app, text="Sistema de Login", font=("Arial", 24)).pack(pady=20)
 
     ctk.CTkLabel(app, text="Usuário").pack()
 
@@ -192,23 +174,15 @@ def abrir_login(app, limpar_tela):
     campo_senha = ctk.CTkEntry(app, show="*", width=250)
     campo_senha.pack(pady=5)
 
-    ctk.CTkButton(
-        app,
-        text="Login",
-        command=validar_login
-    ).pack(pady=10)
+    ctk.CTkButton(app, text="Login", command=validar_login).pack(pady=10)
 
     ctk.CTkButton(
         app,
         text="Cadastrar Usuário",
-        command=lambda: abrir_cadastro_usuario(app, limpar_tela)
+        command=lambda: abrir_cadastro_usuario(app, limpar_tela),
     ).pack(pady=5)
 
-    ctk.CTkButton(
-        app,
-        text="Esqueci minha senha",
-        command=esqueceu_senha
-    ).pack(pady=5)
+    ctk.CTkButton(app, text="Esqueci minha senha", command=esqueceu_senha).pack(pady=5)
 
     label_resultado = ctk.CTkLabel(app, text="")
     label_resultado.pack(pady=10)

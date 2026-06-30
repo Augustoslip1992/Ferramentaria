@@ -8,6 +8,7 @@ def abrir_cadastro_usuario(app, limpar_tela):
 
     def voltar():
         from telas.login import abrir_login
+
         abrir_login(app, limpar_tela)
 
     def cadastrar():
@@ -24,10 +25,13 @@ def abrir_cadastro_usuario(app, limpar_tela):
         cursor = conn.cursor()
 
         try:
-            cursor.execute("""
+            cursor.execute(
+                """
             INSERT INTO usuarios (nome, usuario, email, senha)
             VALUES (?, ?, ?, ?)
-            """, (nome, usuario, email, senha))
+            """,
+                (nome, usuario, email, senha),
+            )
 
             conn.commit()
             conn.close()
@@ -35,20 +39,15 @@ def abrir_cadastro_usuario(app, limpar_tela):
             messagebox.showinfo("Sucesso", "Usuário cadastrado com sucesso!")
 
             from telas.login import abrir_login
+
             abrir_login(app, limpar_tela)
 
-        except:
+        except Exception as e:
             conn.close()
-            messagebox.showerror(
-                "Erro",
-                "Usuário ou e-mail já cadastrado."
-            )
+            print("ERRO REAL:", e)
+            messagebox.showerror("Erro", str(e))
 
-    ctk.CTkLabel(
-        app,
-        text="Cadastro de Usuário",
-        font=("Arial", 24)
-    ).pack(pady=20)
+    ctk.CTkLabel(app, text="Cadastro de Usuário", font=("Arial", 24)).pack(pady=20)
 
     ctk.CTkLabel(app, text="Nome").pack()
     campo_nome = ctk.CTkEntry(app, width=250)
@@ -66,14 +65,6 @@ def abrir_cadastro_usuario(app, limpar_tela):
     campo_senha = ctk.CTkEntry(app, show="*", width=250)
     campo_senha.pack(pady=5)
 
-    ctk.CTkButton(
-        app,
-        text="Cadastrar",
-        command=cadastrar
-    ).pack(pady=15)
+    ctk.CTkButton(app, text="Cadastrar", command=cadastrar).pack(pady=15)
 
-    ctk.CTkButton(
-        app,
-        text="Voltar",
-        command=voltar
-    ).pack(pady=5)
+    ctk.CTkButton(app, text="Voltar", command=voltar).pack(pady=5)
